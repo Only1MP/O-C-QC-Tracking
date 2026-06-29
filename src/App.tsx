@@ -340,19 +340,6 @@ export default function App() {
               </button>
 
               <button
-                id="tab-history"
-                onClick={() => setActiveTab('history')}
-                className={`flex-1 sm:flex-initial flex items-center justify-center gap-1.5 text-[11px] sm:text-xs font-semibold px-3 py-2 sm:py-2.5 rounded-lg transition-all ${
-                  activeTab === 'history'
-                    ? 'bg-brand-forest-500 text-white shadow-xs'
-                    : 'text-brand-beige-100 hover:bg-brand-forest-600/50 hover:text-white'
-                }`}
-              >
-                <History className="w-3.5 h-3.5" />
-                <span>Audits ({logs.length})</span>
-              </button>
-
-              <button
                 id="tab-positions"
                 onClick={() => setActiveTab('positions')}
                 className={`flex-1 sm:flex-initial flex items-center justify-center gap-1.5 text-[11px] sm:text-xs font-semibold px-3 py-2 sm:py-2.5 rounded-lg transition-all ${
@@ -363,6 +350,19 @@ export default function App() {
               >
                 <Users className="w-3.5 h-3.5" />
                 <span>Positions</span>
+              </button>
+
+              <button
+                id="tab-history"
+                onClick={() => setActiveTab('history')}
+                className={`flex-1 sm:flex-initial flex items-center justify-center gap-1.5 text-[11px] sm:text-xs font-semibold px-3 py-2 sm:py-2.5 rounded-lg transition-all ${
+                  activeTab === 'history'
+                    ? 'bg-brand-forest-500 text-white shadow-xs'
+                    : 'text-brand-beige-100 hover:bg-brand-forest-600/50 hover:text-white'
+                }`}
+              >
+                <History className="w-3.5 h-3.5" />
+                <span>Audits ({logs.length})</span>
               </button>
             </div>
 
