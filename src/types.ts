@@ -10,14 +10,15 @@ export type DefectType =
   | 'Assembly Error - Repaired'
   | 'Assembly Error - Scrap'
   | 'Beatle Kill Streaks'
+  | 'Damaged During Repair'
   | 'Fastener Defect'
+  | 'Length'
   | 'Mold'
   | 'Sanding'
-  | 'Thickness - Too Thick'
-  | 'Thickness - Too Thin'
-  | 'Wood Defect'
-  | 'Wrong Dimension - Length'
-  | 'Wrong Dimension - Width';
+  | 'Thick'
+  | 'Thin'
+  | 'Width'
+  | 'Wood Defect';
 
 /**
  * Ordered list of standard wooden parts used throughout the application.
@@ -38,14 +39,15 @@ export const DEFECT_TYPES_LIST: DefectType[] = [
   'Assembly Error - Repaired',
   'Assembly Error - Scrap',
   'Beatle Kill Streaks',
+  'Damaged During Repair',
   'Fastener Defect',
+  'Length',
   'Mold',
   'Sanding',
-  'Thickness - Too Thick',
-  'Thickness - Too Thin',
-  'Wood Defect',
-  'Wrong Dimension - Length',
-  'Wrong Dimension - Width'
+  'Thick',
+  'Thin',
+  'Width',
+  'Wood Defect'
 ];
 
 /**
@@ -87,12 +89,24 @@ export interface QCDefectLog {
   sku: string; // Product SKU being inspected
   shiftReportedBy: string; // QC Inspector/Operator name
   matrix: DefectMatrix; // Quantified defect tally breakdown
+  kitBins?: Record<string, boolean>; // Kit Bin flags per Part (default false/unchecked)
   additionalNotes: string; // Qualitative inspector observations
   createdAt: string; // ISO 8601 Timestamp of submission
   positions?: { // Labor layout snapshot at time of report
     morning: ShiftAssignments;
     afternoon: ShiftAssignments;
   };
+}
+
+/**
+ * Utility function to instantiate zeroed Kit Bin checkbox states.
+ */
+export function createEmptyKitBins(): Record<string, boolean> {
+  const kitBins: Record<string, boolean> = {};
+  for (const part of STANDARD_PARTS) {
+    kitBins[part] = false;
+  }
+  return kitBins;
 }
 
 /**

@@ -20,17 +20,18 @@ export function generateCSVContent(log: QCDefectLog): string {
   csvRows.push('');
 
   // Row Header
-  csvRows.push(`PART TYPE,${DEFECT_TYPES_LIST.join(',')},Total`);
+  csvRows.push(`PART TYPE,Kit Bin,${DEFECT_TYPES_LIST.join(',')},Total`);
 
   // Matrix Rows
   STANDARD_PARTS.forEach((part) => {
     let rTotal = 0;
+    const isKitBin = log.kitBins?.[part] ? 'Yes' : 'No';
     const values = DEFECT_TYPES_LIST.map((defect) => {
       const val = log.matrix[part]?.[defect] || 0;
       rTotal += val;
       return val;
     });
-    csvRows.push(`${part},${values.join(',')},${rTotal}`);
+    csvRows.push(`${part},${isKitBin},${values.join(',')},${rTotal}`);
   });
 
   // Column totals
@@ -43,7 +44,7 @@ export function generateCSVContent(log: QCDefectLog): string {
   });
   
   const grandTotal = colTotals.reduce((s, v) => s + v, 0);
-  csvRows.push(`Column Totals,${colTotals.join(',')},${grandTotal}`);
+  csvRows.push(`Column Totals,-,${colTotals.join(',')},${grandTotal}`);
 
   if (log.positions) {
     csvRows.push('');
@@ -83,12 +84,20 @@ export function generateEmailReportBody(log: QCDefectLog, grandTotal: number): s
     text += `No inspection comments reported.\n\n`;
   }
 
-  text += `DEFECT TALLY SUMMARY:\n`;
+  text += `KIT BIN STATUS BY PART:\n`;
+  text += `----------------------\n`;
+  STANDARD_PARTS.forEach((part) => {
+    text += `  • ${part}: Kit Bin = ${log.kitBins?.[part] ? 'Yes' : 'No'}\n`;
+  });
+  text += `\n`;
+
+  text += `DEFECT TALLY SUMMARY (Alphabetical Order):\n`;
   text += `--------------------\n`;
   
   let hasDefects = false;
   STANDARD_PARTS.forEach((part) => {
     const partDefects: string[] = [];
+    const isKitBin = log.kitBins?.[part] ? 'Yes' : 'No';
     DEFECT_TYPES_LIST.forEach((defect) => {
       const count = log.matrix[part]?.[defect] || 0;
       if (count > 0) {
@@ -97,7 +106,7 @@ export function generateEmailReportBody(log: QCDefectLog, grandTotal: number): s
       }
     });
     if (partDefects.length > 0) {
-      text += `[${part.toUpperCase()} PART]\n${partDefects.join('\n')}\n\n`;
+      text += `[${part.toUpperCase()} PART] (Kit Bin: ${isKitBin})\n${partDefects.join('\n')}\n\n`;
     }
   });
 

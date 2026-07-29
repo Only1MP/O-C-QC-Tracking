@@ -12,13 +12,17 @@ import {
 
 interface DefectMatrixTableProps {
   matrix: DefectMatrix;
+  kitBins: Record<string, boolean>;
   updateCell: (part: Part, defect: DefectType, value: number) => void;
+  updateKitBin: (part: Part, checked: boolean) => void;
   resetMatrix: () => void;
 }
 
 export default function DefectMatrixTable({
   matrix,
+  kitBins,
   updateCell,
+  updateKitBin,
   resetMatrix
 }: DefectMatrixTableProps) {
   // Toggle between Mobile-First Pocket Tapper and Desktop Excel Grid
@@ -54,6 +58,20 @@ export default function DefectMatrixTable({
     }
     return sum;
   };
+
+  // Dynamically sort defect categories so category with most defects counted moves to top
+  const getSortedDefectTypes = (): DefectType[] => {
+    return [...DEFECT_TYPES_LIST].sort((a, b) => {
+      const totalA = getColTotal(a);
+      const totalB = getColTotal(b);
+      if (totalB !== totalA) {
+        return totalB - totalA;
+      }
+      return DEFECT_TYPES_LIST.indexOf(a) - DEFECT_TYPES_LIST.indexOf(b);
+    });
+  };
+
+  const sortedDefectTypes = getSortedDefectTypes();
 
   const handleCellClick = (part: Part, defect: DefectType) => {
     const current = matrix[part]?.[defect] || 0;
@@ -173,35 +191,52 @@ export default function DefectMatrixTable({
             <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest block mb-2">
               1. Choose Wooden Part to Inspect:
             </span>
-            <div className="grid grid-cols-2 xs:grid-cols-3 sm:grid-cols-6 gap-2">
+            <div className="grid grid-cols-2 xs:grid-cols-3 sm:grid-cols-6 gap-2.5">
               {STANDARD_PARTS.map((part) => {
                 const isSelected = selectedPart === part;
                 const partTotal = getRowTotal(part);
+                const isKitBin = !!kitBins[part];
                 return (
-                  <button
-                    key={part}
-                    id={`mobile-part-btn-${part}`}
-                    onClick={() => setSelectedPart(part)}
-                    className={`p-3 rounded-xl border flex flex-col items-center justify-center transition-all cursor-pointer relative ${
-                      isSelected
-                        ? 'bg-brand-forest-600 border-brand-forest-700 text-white ring-3 ring-brand-forest-500/20 font-bold scale-[1.01] shadow-xs'
-                        : 'bg-brand-beige-50 hover:bg-brand-beige-100 text-gray-700 border-brand-beige-200'
-                    }`}
-                  >
-                    <span className="text-[11px] uppercase tracking-wider font-semibold block">{part}</span>
-                    <span className={`text-xs font-mono font-bold mt-1.5 px-2 py-0.5 rounded-full ${
-                      isSelected 
-                        ? 'bg-brand-forest-800 text-white' 
-                        : partTotal > 0
-                          ? 'bg-amber-100 text-amber-900 border border-amber-200'
-                          : 'bg-brand-beige-200 text-gray-600'
-                    }`}>
-                      {partTotal} {partTotal === 1 ? 'defect' : 'defects'}
-                    </span>
-                    {isSelected && (
-                      <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-amber-400 rounded-full animate-pulse"></span>
-                    )}
-                  </button>
+                  <div key={part} className="flex flex-col gap-1.5">
+                    <button
+                      id={`mobile-part-btn-${part}`}
+                      onClick={() => setSelectedPart(part)}
+                      className={`p-3 rounded-xl border flex flex-col items-center justify-center transition-all cursor-pointer relative ${
+                        isSelected
+                          ? 'bg-brand-forest-600 border-brand-forest-700 text-white ring-3 ring-brand-forest-500/20 font-bold scale-[1.01] shadow-xs'
+                          : 'bg-brand-beige-50 hover:bg-brand-beige-100 text-gray-700 border-brand-beige-200'
+                      }`}
+                    >
+                      <span className="text-[11px] uppercase tracking-wider font-semibold block">{part}</span>
+                      <span className={`text-xs font-mono font-bold mt-1.5 px-2 py-0.5 rounded-full ${
+                        isSelected 
+                          ? 'bg-brand-forest-800 text-white' 
+                          : partTotal > 0
+                            ? 'bg-amber-100 text-amber-900 border border-amber-200'
+                            : 'bg-brand-beige-200 text-gray-600'
+                      }`}>
+                        {partTotal} {partTotal === 1 ? 'defect' : 'defects'}
+                      </span>
+                      {isSelected && (
+                        <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-amber-400 rounded-full animate-pulse"></span>
+                      )}
+                    </button>
+                    
+                    {/* Kit Bin checkbox under part button */}
+                    <label 
+                      className="flex items-center justify-center gap-1.5 py-1 px-2 rounded-lg bg-brand-beige-50 hover:bg-brand-beige-100 border border-brand-beige-200 text-[11px] font-semibold text-gray-700 cursor-pointer transition-all select-none"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <input
+                        id={`kit-bin-cb-mob-${part}`}
+                        type="checkbox"
+                        checked={isKitBin}
+                        onChange={(e) => updateKitBin(part, e.target.checked)}
+                        className="w-3.5 h-3.5 rounded border-brand-beige-300 text-brand-forest-600 focus:ring-brand-forest-500 cursor-pointer"
+                      />
+                      <span>Kit Bin</span>
+                    </label>
+                  </div>
                 );
               })}
             </div>
@@ -229,7 +264,7 @@ export default function DefectMatrixTable({
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-              {DEFECT_TYPES_LIST.map((defect) => {
+              {sortedDefectTypes.map((defect) => {
                 const count = matrix[selectedPart]?.[defect] || 0;
                 
                 return (
@@ -315,11 +350,11 @@ export default function DefectMatrixTable({
             <thead>
               <tr className="bg-brand-beige-50/70 border-b border-brand-beige-200">
                 {/* Frozen Left Corner */}
-                <th className="sticky left-0 z-10 bg-brand-beige-100 text-xs font-bold text-brand-beige-800 uppercase tracking-wider px-4 py-3 border-r border-brand-beige-200 w-32 shadow-xs">
+                <th className="sticky left-0 z-10 bg-brand-beige-100 text-xs font-bold text-brand-beige-800 uppercase tracking-wider px-4 py-3 border-r border-brand-beige-200 w-36 shadow-xs">
                   PART TYPE
                 </th>
                 {/* Defect Column Headers */}
-                {DEFECT_TYPES_LIST.map((defect) => (
+                {sortedDefectTypes.map((defect) => (
                   <th
                     key={defect}
                     className="text-[10px] sm:text-xs font-bold text-gray-700 uppercase tracking-tight p-2.5 text-center leading-tight border-r border-brand-beige-200"
@@ -343,16 +378,30 @@ export default function DefectMatrixTable({
                     key={part}
                     className="border-b border-brand-beige-100 hover:bg-brand-beige-50/20 transition-all"
                   >
-                    {/* Part Row Label (Sticky Sticky) */}
-                    <td className="sticky left-0 bg-brand-beige-50 font-bold text-sm text-gray-800 px-4 py-4 border-r border-brand-beige-200 shadow-xs z-10 flex items-center justify-between">
-                      <span>{part}</span>
-                      <span className="text-[10px] font-mono text-gray-400 bg-brand-beige-100 px-1.5 py-0.5 rounded-sm">
-                        #{STANDARD_PARTS.indexOf(part) + 1}
-                      </span>
+                    {/* Part Row Label (Sticky) */}
+                    <td className="sticky left-0 bg-brand-beige-50 font-bold text-sm text-gray-800 px-3 py-3 border-r border-brand-beige-200 shadow-xs z-10">
+                      <div className="flex flex-col gap-1.5">
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm font-bold text-gray-800">{part}</span>
+                          <span className="text-[10px] font-mono text-gray-400 bg-brand-beige-100 px-1.5 py-0.5 rounded-sm">
+                            #{STANDARD_PARTS.indexOf(part) + 1}
+                          </span>
+                        </div>
+                        <label className="flex items-center gap-1.5 cursor-pointer text-[11px] font-medium text-gray-700 hover:text-gray-900 select-none bg-white/80 px-2 py-1 rounded border border-brand-beige-200">
+                          <input
+                            id={`kit-bin-cb-grid-${part}`}
+                            type="checkbox"
+                            checked={!!kitBins[part]}
+                            onChange={(e) => updateKitBin(part, e.target.checked)}
+                            className="w-3.5 h-3.5 rounded border-gray-300 text-brand-forest-600 focus:ring-brand-forest-500 cursor-pointer"
+                          />
+                          <span className="font-semibold text-gray-700">Kit Bin</span>
+                        </label>
+                      </div>
                     </td>
 
                     {/* Individual Defect Cells */}
-                    {DEFECT_TYPES_LIST.map((defect) => {
+                    {sortedDefectTypes.map((defect) => {
                       const count = matrix[part]?.[defect] || 0;
                       const cellBg = getCellBgClass(count);
 
@@ -437,7 +486,7 @@ export default function DefectMatrixTable({
                 <td className="sticky left-0 bg-brand-beige-100 font-bold text-xs uppercase text-brand-beige-800 px-4 py-3.5 border-r border-brand-beige-200 shadow-xs z-10">
                   Column Total
                 </td>
-                {DEFECT_TYPES_LIST.map((defect) => {
+                {sortedDefectTypes.map((defect) => {
                   const total = getColTotal(defect);
                   return (
                     <td

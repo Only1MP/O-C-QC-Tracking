@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { STANDARD_PARTS, DEFECT_TYPES_LIST, DefectMatrix, QCDefectLog, createEmptyMatrix, Part, DefectType, ProductionLineState } from './types';
+import { STANDARD_PARTS, DEFECT_TYPES_LIST, DefectMatrix, QCDefectLog, createEmptyMatrix, createEmptyKitBins, Part, DefectType, ProductionLineState } from './types';
 import Header from './components/Header';
 import DefectMatrixTable from './components/DefectMatrixTable';
 import DefectHistory from './components/DefectHistory';
@@ -132,6 +132,16 @@ export default function App() {
     } catch (_) {}
     return createEmptyMatrix();
   });
+  const [kitBins, setKitBins] = useState<Record<string, boolean>>(() => {
+    try {
+      const stored = localStorage.getItem('shop_pulse_active_kit_bins');
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        if (parsed && typeof parsed === 'object') return parsed;
+      }
+    } catch (_) {}
+    return createEmptyKitBins();
+  });
   const [additionalNotes, setAdditionalNotes] = useState<string>(() => {
     try {
       const stored = localStorage.getItem('shop_pulse_active_additional_notes');
@@ -150,11 +160,12 @@ export default function App() {
       localStorage.setItem('shop_pulse_active_sku', sku);
       localStorage.setItem('shop_pulse_active_reported_by', shiftReportedBy);
       localStorage.setItem('shop_pulse_active_matrix', JSON.stringify(matrix));
+      localStorage.setItem('shop_pulse_active_kit_bins', JSON.stringify(kitBins));
       localStorage.setItem('shop_pulse_active_additional_notes', additionalNotes);
     } catch (err) {
       console.warn('Failed to save active sheet draft', err);
     }
-  }, [date, sku, shiftReportedBy, matrix, additionalNotes]);
+  }, [date, sku, shiftReportedBy, matrix, kitBins, additionalNotes]);
   
   // Inline feedback state
   const [notification, setNotification] = useState<{ type: 'success' | 'info' | 'error'; message: string } | null>(null);
@@ -182,8 +193,16 @@ export default function App() {
     });
   };
 
+  const handleUpdateKitBin = (part: Part, checked: boolean) => {
+    setKitBins((prev) => ({
+      ...prev,
+      [part]: checked
+    }));
+  };
+
   const handleResetMatrix = () => {
     setMatrix(createEmptyMatrix());
+    setKitBins(createEmptyKitBins());
     showNotification('info', 'Tally board reset to zero counts.');
   };
 
@@ -217,6 +236,7 @@ export default function App() {
       sku: sku.trim().toUpperCase(),
       shiftReportedBy: shiftReportedBy.trim() || 'Unassigned Operator',
       matrix: JSON.parse(JSON.stringify(matrix)),
+      kitBins: JSON.parse(JSON.stringify(kitBins)),
       additionalNotes: additionalNotes.trim(),
       createdAt: new Date().toISOString(),
       positions: {
@@ -244,6 +264,7 @@ export default function App() {
 
     // Reset contemporary entries for the next audit
     setMatrix(createEmptyMatrix());
+    setKitBins(createEmptyKitBins());
     setAdditionalNotes('');
   };
 
@@ -264,6 +285,7 @@ export default function App() {
     setSku(log.sku);
     setShiftReportedBy(log.shiftReportedBy);
     setMatrix(JSON.parse(JSON.stringify(log.matrix)));
+    setKitBins(log.kitBins ? JSON.parse(JSON.stringify(log.kitBins)) : createEmptyKitBins());
     setAdditionalNotes(log.additionalNotes);
     setActiveTab('tally');
     showNotification('success', `Restored Audit ${log.sku} from ${log.date} into active board.`);
@@ -280,6 +302,7 @@ export default function App() {
       sku: sku.trim().toUpperCase(),
       shiftReportedBy: shiftReportedBy.trim() || 'Operator',
       matrix: JSON.parse(JSON.stringify(matrix)),
+      kitBins: JSON.parse(JSON.stringify(kitBins)),
       additionalNotes: additionalNotes.trim(),
       createdAt: new Date().toISOString(),
       positions: {
@@ -388,7 +411,9 @@ export default function App() {
             {/* Interactive Grid Table and tallies */}
             <DefectMatrixTable
               matrix={matrix}
+              kitBins={kitBins}
               updateCell={handleUpdateCell}
+              updateKitBin={handleUpdateKitBin}
               resetMatrix={handleResetMatrix}
             />
 

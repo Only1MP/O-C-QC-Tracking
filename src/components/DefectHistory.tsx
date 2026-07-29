@@ -51,17 +51,18 @@ export default function DefectHistory({
     csvRows.push('');
 
     // Row Header for Matrix
-    csvRows.push(`PART TYPE,${DEFECT_TYPES_LIST.join(',')},Total`);
+    csvRows.push(`PART TYPE,Kit Bin,${DEFECT_TYPES_LIST.join(',')},Total`);
 
     // Matrix Rows
     STANDARD_PARTS.forEach((part) => {
       let rTotal = 0;
+      const isKitBin = log.kitBins?.[part] ? 'Yes' : 'No';
       const values = DEFECT_TYPES_LIST.map((defect) => {
         const val = log.matrix[part]?.[defect] || 0;
         rTotal += val;
         return val;
       });
-      csvRows.push(`${part},${values.join(',')},${rTotal}`);
+      csvRows.push(`${part},${isKitBin},${values.join(',')},${rTotal}`);
     });
 
     // Column totals
@@ -74,7 +75,7 @@ export default function DefectHistory({
     });
     
     const grandTotal = colTotals.reduce((s, v) => s + v, 0);
-    csvRows.push(`Column Totals,${colTotals.join(',')},${grandTotal}`);
+    csvRows.push(`Column Totals,-,${colTotals.join(',')},${grandTotal}`);
 
     if (log.positions) {
       csvRows.push('');
@@ -109,14 +110,15 @@ export default function DefectHistory({
     if (logs.length === 0) return;
     
     let csvRows = [];
-    csvRows.push('Log ID,Date,Product SKU,Reported By,Part Type,Defect Type,Defect Count');
+    csvRows.push('Log ID,Date,Product SKU,Reported By,Part Type,Kit Bin,Defect Type,Defect Count');
 
     logs.forEach((log) => {
       STANDARD_PARTS.forEach((part) => {
+        const isKitBin = log.kitBins?.[part] ? 'Yes' : 'No';
         DEFECT_TYPES_LIST.forEach((defect) => {
           const count = log.matrix[part]?.[defect] || 0;
           if (count > 0) {
-            csvRows.push(`"${log.id}","${log.date}","${log.sku}","${log.shiftReportedBy.replace(/"/g, '""')}","${part}","${defect}",${count}`);
+            csvRows.push(`"${log.id}","${log.date}","${log.sku}","${log.shiftReportedBy.replace(/"/g, '""')}","${part}","${isKitBin}","${defect}",${count}`);
           }
         });
       });
