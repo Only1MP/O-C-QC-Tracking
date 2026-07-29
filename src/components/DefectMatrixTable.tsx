@@ -10,6 +10,37 @@ import {
   Grid3X3
 } from 'lucide-react';
 
+// User-specified display order for defect categories on screen
+const PREFERRED_DEFECT_ORDER: string[] = [
+  'Wood Defect',
+  'Fastener Defect',
+  'Width',
+  'Length',
+  'Thick',
+  'Thin',
+  'Sanding',
+  'Mold',
+  'Assembly Error - Repaired',
+  'Assembly Error - Scrap',
+  'Beatle Kill Streaks'
+];
+
+const DISPLAY_DEFECT_TYPES: DefectType[] = (() => {
+  const ordered: DefectType[] = [];
+  PREFERRED_DEFECT_ORDER.forEach((pref) => {
+    const found = DEFECT_TYPES_LIST.find((dt) => dt === pref);
+    if (found) {
+      ordered.push(found);
+    }
+  });
+  DEFECT_TYPES_LIST.forEach((dt) => {
+    if (!ordered.includes(dt)) {
+      ordered.push(dt);
+    }
+  });
+  return ordered;
+})();
+
 interface DefectMatrixTableProps {
   matrix: DefectMatrix;
   kitBins: Record<string, boolean>;
@@ -58,20 +89,6 @@ export default function DefectMatrixTable({
     }
     return sum;
   };
-
-  // Dynamically sort defect categories so category with most defects counted moves to top
-  const getSortedDefectTypes = (): DefectType[] => {
-    return [...DEFECT_TYPES_LIST].sort((a, b) => {
-      const totalA = getColTotal(a);
-      const totalB = getColTotal(b);
-      if (totalB !== totalA) {
-        return totalB - totalA;
-      }
-      return DEFECT_TYPES_LIST.indexOf(a) - DEFECT_TYPES_LIST.indexOf(b);
-    });
-  };
-
-  const sortedDefectTypes = getSortedDefectTypes();
 
   const handleCellClick = (part: Part, defect: DefectType) => {
     const current = matrix[part]?.[defect] || 0;
@@ -264,7 +281,7 @@ export default function DefectMatrixTable({
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-              {sortedDefectTypes.map((defect) => {
+              {DISPLAY_DEFECT_TYPES.map((defect) => {
                 const count = matrix[selectedPart]?.[defect] || 0;
                 
                 return (
@@ -354,7 +371,7 @@ export default function DefectMatrixTable({
                   PART TYPE
                 </th>
                 {/* Defect Column Headers */}
-                {sortedDefectTypes.map((defect) => (
+                {DISPLAY_DEFECT_TYPES.map((defect) => (
                   <th
                     key={defect}
                     className="text-[10px] sm:text-xs font-bold text-gray-700 uppercase tracking-tight p-2.5 text-center leading-tight border-r border-brand-beige-200"
@@ -401,7 +418,7 @@ export default function DefectMatrixTable({
                     </td>
 
                     {/* Individual Defect Cells */}
-                    {sortedDefectTypes.map((defect) => {
+                    {DISPLAY_DEFECT_TYPES.map((defect) => {
                       const count = matrix[part]?.[defect] || 0;
                       const cellBg = getCellBgClass(count);
 
@@ -486,7 +503,7 @@ export default function DefectMatrixTable({
                 <td className="sticky left-0 bg-brand-beige-100 font-bold text-xs uppercase text-brand-beige-800 px-4 py-3.5 border-r border-brand-beige-200 shadow-xs z-10">
                   Column Total
                 </td>
-                {sortedDefectTypes.map((defect) => {
+                {DISPLAY_DEFECT_TYPES.map((defect) => {
                   const total = getColTotal(defect);
                   return (
                     <td
