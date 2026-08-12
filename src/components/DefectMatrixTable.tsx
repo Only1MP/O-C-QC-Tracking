@@ -90,7 +90,16 @@ export default function DefectMatrixTable({
     return sum;
   };
 
+  const triggerHaptic = (ms = 15) => {
+    if (typeof navigator !== 'undefined' && 'vibrate' in navigator) {
+      try {
+        navigator.vibrate(ms);
+      } catch (_) {}
+    }
+  };
+
   const handleCellClick = (part: Part, defect: DefectType) => {
+    triggerHaptic(12);
     const current = matrix[part]?.[defect] || 0;
     if (activeMode === 'increment') {
       updateCell(part, defect, current + 1);
@@ -100,11 +109,13 @@ export default function DefectMatrixTable({
   };
 
   const incrementDefectMobile = (part: Part, defect: DefectType) => {
+    triggerHaptic(15);
     const current = matrix[part]?.[defect] || 0;
     updateCell(part, defect, current + 1);
   };
 
   const decrementDefectMobile = (part: Part, defect: DefectType) => {
+    triggerHaptic(20);
     const current = matrix[part]?.[defect] || 0;
     if (current > 0) {
       updateCell(part, defect, current - 1);
@@ -141,16 +152,11 @@ export default function DefectMatrixTable({
               <span>Defect Tally Board</span>
               {getGrandTotal() > 0 && (
                 <span className="bg-brand-forest-500 text-white font-mono text-xs px-2.5 py-0.5 rounded-full font-bold">
-                  {getGrandTotal()} defects logged
+                  {getGrandTotal()}
                 </span>
               )}
             </h2>
           </div>
-          <p className="text-xs text-gray-500">
-            {viewMode === 'mobile' 
-              ? `Tap any category to add a tally for the selected ${selectedPart} part.` 
-              : 'Click grid cells directly to increment counts. Best on wider screens.'}
-          </p>
         </div>
 
         {/* CONTROLLERS - INTERFACE SELECTORS */}
@@ -168,7 +174,7 @@ export default function DefectMatrixTable({
               }`}
             >
               <Smartphone className="w-3.5 h-3.5" />
-              <span>Mobile Tap-Board</span>
+              <span>Mobile View</span>
             </button>
             <button
               id="layout-grid-btn"
@@ -180,7 +186,7 @@ export default function DefectMatrixTable({
               }`}
             >
               <Grid3X3 className="w-3.5 h-3.5" />
-              <span>Full Grid Matrix</span>
+              <span>Grid View</span>
             </button>
           </div>
 
@@ -192,7 +198,7 @@ export default function DefectMatrixTable({
               className="text-xs text-red-650 hover:text-red-700 font-semibold px-3 py-1.5 bg-red-50 hover:bg-red-100 border border-red-100 rounded-lg transition-all flex items-center gap-1 cursor-pointer"
             >
               <RotateCcw className="w-3.5 h-3.5" />
-              <span>Reset Tally Sheet</span>
+              <span>Reset</span>
             </button>
           </div>
 
@@ -206,7 +212,7 @@ export default function DefectMatrixTable({
           {/* STEP 1: SELECT COMPONENT PART PIECE */}
           <div>
             <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest block mb-2">
-              1. Choose Wooden Part to Inspect:
+              Select Part:
             </span>
             <div className="grid grid-cols-2 xs:grid-cols-3 sm:grid-cols-6 gap-2.5">
               {STANDARD_PARTS.map((part) => {
@@ -263,7 +269,7 @@ export default function DefectMatrixTable({
           <div className="mt-2">
             <div className="flex items-center justify-between mb-2">
               <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">
-                2. Tap Category to Count Damage for <strong className="text-brand-forest-600 underline decoration-brand-forest-500">{selectedPart}</strong>:
+                Defects for <strong className="text-brand-forest-600 underline decoration-brand-forest-500">{selectedPart}</strong>:
               </span>
               {getRowTotal(selectedPart) > 0 && (
                 <button

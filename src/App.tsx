@@ -4,6 +4,7 @@ import Header from './components/Header';
 import DefectMatrixTable from './components/DefectMatrixTable';
 import DefectHistory from './components/DefectHistory';
 import ShareReportModal from './components/ShareReportModal';
+import AndroidInstallModal from './components/AndroidInstallModal';
 import { 
   Clipboard, 
   History, 
@@ -16,7 +17,8 @@ import {
   Share2, 
   Play,
   Mail,
-  Users
+  Users,
+  Smartphone
 } from 'lucide-react';
 import ProductionForce from './components/ProductionForce';
 
@@ -169,6 +171,7 @@ export default function App() {
   
   // Inline feedback state
   const [notification, setNotification] = useState<{ type: 'success' | 'info' | 'error'; message: string } | null>(null);
+  const [isAndroidModalOpen, setIsAndroidModalOpen] = useState<boolean>(false);
 
   // Auto clear notifications
   useEffect(() => {
@@ -406,6 +409,7 @@ export default function App() {
               setSku={setSku}
               shiftReportedBy={shiftReportedBy}
               setShiftReportedBy={setShiftReportedBy}
+              onOpenAndroidModal={() => setIsAndroidModalOpen(true)}
             />
 
             {/* Interactive Grid Table and tallies */}
@@ -508,10 +512,62 @@ export default function App() {
         />
       )}
 
-      {/* Decorative Brand footer */}
-      <footer className="text-center mt-12 mb-4 text-xs text-gray-400">
-        <p className="font-mono">ShopPulse — Olive &amp; Cocoa Woodshop — Daily Quality Control Log System</p>
-        <p className="text-[10px] text-gray-400 mt-1">&copy; {new Date().getFullYear()} Daily QC Defect Log. Built for instant high precision.</p>
+      {/* Android Install & Capabilities Modal */}
+      <AndroidInstallModal
+        isOpen={isAndroidModalOpen}
+        onClose={() => setIsAndroidModalOpen(false)}
+      />
+
+      {/* Android Mobile Bottom Quick Action Bar */}
+      <div className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-brand-forest-900/95 backdrop-blur-md border-t border-brand-forest-700/80 px-2 py-1.5 shadow-lg flex items-center justify-around">
+        <button
+          onClick={() => setActiveTab('tally')}
+          className={`flex flex-col items-center gap-0.5 py-1 px-3 rounded-lg text-[10px] font-bold transition-all ${
+            activeTab === 'tally'
+              ? 'text-amber-300 bg-brand-forest-800'
+              : 'text-brand-beige-200 hover:text-white'
+          }`}
+        >
+          <Clipboard className="w-4 h-4" />
+          <span>Tally Sheet</span>
+        </button>
+
+        <button
+          onClick={() => setActiveTab('positions')}
+          className={`flex flex-col items-center gap-0.5 py-1 px-3 rounded-lg text-[10px] font-bold transition-all ${
+            activeTab === 'positions'
+              ? 'text-amber-300 bg-brand-forest-800'
+              : 'text-brand-beige-200 hover:text-white'
+          }`}
+        >
+          <Users className="w-4 h-4" />
+          <span>Positions</span>
+        </button>
+
+        <button
+          onClick={() => setActiveTab('history')}
+          className={`flex flex-col items-center gap-0.5 py-1 px-3 rounded-lg text-[10px] font-bold transition-all ${
+            activeTab === 'history'
+              ? 'text-amber-300 bg-brand-forest-800'
+              : 'text-brand-beige-200 hover:text-white'
+          }`}
+        >
+          <History className="w-4 h-4" />
+          <span>Audits ({logs.length})</span>
+        </button>
+
+        <button
+          onClick={() => setIsAndroidModalOpen(true)}
+          className="flex flex-col items-center gap-0.5 py-1 px-3 rounded-lg text-[10px] font-bold text-emerald-300 hover:text-white transition-all"
+        >
+          <Smartphone className="w-4 h-4" />
+          <span>Android</span>
+        </button>
+      </div>
+
+      {/* Minimal Footer */}
+      <footer className="text-center mt-12 mb-16 md:mb-4 text-xs text-gray-400 px-4">
+        <p>&copy; {new Date().getFullYear()} Daily QC Defect Log</p>
       </footer>
 
     </div>

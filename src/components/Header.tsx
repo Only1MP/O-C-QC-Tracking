@@ -1,5 +1,5 @@
 import React from 'react';
-import { Calendar, ClipboardList, User, Layers, Sparkles } from 'lucide-react';
+import { Calendar, ClipboardList, User, Layers, Smartphone } from 'lucide-react';
 
 interface HeaderProps {
   date: string;
@@ -8,6 +8,7 @@ interface HeaderProps {
   setSku: (sku: string) => void;
   shiftReportedBy: string;
   setShiftReportedBy: (name: string) => void;
+  onOpenAndroidModal?: () => void;
 }
 
 const COMMON_SKUS = [
@@ -25,30 +26,32 @@ export default function Header({
   sku,
   setSku,
   shiftReportedBy,
-  setShiftReportedBy
+  setShiftReportedBy,
+  onOpenAndroidModal
 }: HeaderProps) {
   return (
     <div className="bg-white border border-brand-beige-200 rounded-xl p-6 shadow-xs relative overflow-hidden">
       {/* Visual Woodgrain Accent Panel */}
       <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-brand-beige-800 via-brand-beige-300 to-brand-forest-600"></div>
 
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
         <div>
-          <div className="flex items-center gap-2 mb-1">
-            <span className="p-1.5 bg-brand-beige-100 text-brand-beige-800 rounded-md">
-              <ClipboardList className="w-5 h-5 text-brand-forest-600" />
-            </span>
-            <span className="text-xs uppercase tracking-wider font-mono font-bold text-brand-forest-500">
-              ShopPulse • Olive &amp; Cocoa Woodshop
-            </span>
-          </div>
           <h1 className="text-2xl font-bold text-gray-900 tracking-tight font-sans">
             Daily QC Defect Log
           </h1>
-          <p className="text-xs text-gray-500">
-            Digital Quality Control entry sheet and real-time damage tallying system.
-          </p>
         </div>
+
+        {/* Android App Button */}
+        {onOpenAndroidModal && (
+          <button
+            onClick={onOpenAndroidModal}
+            className="self-start sm:self-center px-3.5 py-2 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-900 border border-emerald-300/80 text-xs font-bold flex items-center gap-2 shadow-2xs transition-all cursor-pointer group shrink-0"
+          >
+            <Smartphone className="w-4 h-4 text-emerald-700 group-hover:scale-110 transition-transform" />
+            <span>Android App</span>
+            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+          </button>
+        )}
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">

@@ -143,7 +143,6 @@ export function generateEmailReportBody(log: QCDefectLog, grandTotal: number): s
   }
 
   text += `---------------------------------------\n`;
-  text += `Generated automatically via ShopPulse Quality Inspector Dashboard.\n`;
   return text;
 }
 
@@ -212,7 +211,6 @@ export default function ShareReportModal({
             <Mail className="w-5 h-5 text-amber-300 animate-pulse" />
             <div>
               <h3 className="font-bold text-sm tracking-tight font-sans">Export &amp; Share QC Record</h3>
-              <p className="text-[10px] text-brand-beige-200">Generate CSV attachments or draft instant summary emails</p>
             </div>
           </div>
           <button

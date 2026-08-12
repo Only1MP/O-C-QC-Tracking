@@ -148,26 +148,13 @@ export default function ProductionForce({
 
   return (
     <div className="flex flex-col gap-6 animate-fade-in" id="production-positions-panel">
-      {/* Tab Descriptive Header */}
+      {/* Header */}
       <div className="bg-white border border-brand-beige-200 rounded-xl p-6 shadow-xs relative overflow-hidden">
         <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-brand-forest-500 via-brand-beige-300 to-brand-forest-750"></div>
         
-        <div className="flex items-center gap-2 mb-2">
-          <span className="p-1.5 bg-brand-forest-50 text-brand-forest-600 rounded-md">
-            <SlidersHorizontal className="w-5 h-5 text-brand-forest-600" />
-          </span>
-          <span className="text-xs uppercase tracking-wider font-mono font-bold text-brand-forest-500">
-            Operations &amp; Logistics
-          </span>
-        </div>
-
         <h1 className="text-xl sm:text-2xl font-bold text-gray-900 tracking-tight font-sans">
           Production Line Position Tracker
         </h1>
-        <p className="text-xs text-gray-500 max-w-2xl mt-1 leading-relaxed">
-          Monitor woodshop operator placements on the assembly floor. Set up crew assignments independently 
-          for both <strong className="text-brand-forest-700">Morning</strong> and <strong className="text-amber-700">Afternoon</strong> shifts. This deployment matrix snapshots automatically into your daily saved audits and reports.
-        </p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
