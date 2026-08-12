@@ -103,6 +103,27 @@ export default function AndroidInstallModal({ isOpen, onClose }: AndroidInstallM
             </button>
           )}
 
+          {/* Native APK Section */}
+          <div className="bg-emerald-50/80 rounded-xl p-4 border border-emerald-200/80 space-y-2">
+            <h3 className="text-xs font-bold text-emerald-900 uppercase tracking-wider flex items-center gap-1.5">
+              <Download className="w-4 h-4 text-emerald-700" />
+              Native APK Download (GitHub):
+            </h3>
+            <p className="text-xs text-emerald-800 leading-relaxed">
+              When exported or pushed to GitHub, the automated GitHub Action workflow (<code className="bg-emerald-100 px-1 py-0.5 rounded text-[11px] font-mono">android.yml</code>) automatically builds a native Android <strong>.apk</strong> file.
+            </p>
+            <div className="text-xs text-emerald-900 pt-1">
+              <span className="font-bold">Steps to download native APK:</span>
+              <ol className="list-decimal list-inside space-y-1 mt-1 text-[11px] text-emerald-800">
+                <li>Go to your repository on <strong>GitHub</strong>.</li>
+                <li>Click on the <strong>Actions</strong> tab.</li>
+                <li>Select the latest <strong>Build Android APK</strong> run.</li>
+                <li>Under <strong>Artifacts</strong>, download <strong>Daily-QC-Defect-Log-Android-APK</strong>.</li>
+                <li>Transfer the <code className="font-mono text-[10px]">app-debug.apk</code> file to your Android phone to install and run natively!</li>
+              </ol>
+            </div>
+          </div>
+
           {/* Manual Installation Instructions */}
           {!isInstalled && (
             <div className="bg-brand-beige-50 rounded-xl p-4 border border-brand-beige-200 space-y-3">
