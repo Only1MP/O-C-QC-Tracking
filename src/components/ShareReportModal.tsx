@@ -91,7 +91,7 @@ export function generateEmailReportBody(log: QCDefectLog, grandTotal: number): s
   });
   text += `\n`;
 
-  text += `DEFECT TALLY SUMMARY (Alphabetical Order):\n`;
+  text += `DEFECT TALLY SUMMARY:\n`;
   text += `--------------------\n`;
   
   let hasDefects = false;

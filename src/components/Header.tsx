@@ -1,5 +1,5 @@
 import React from 'react';
-import { Calendar, ClipboardList, User, Layers, Smartphone } from 'lucide-react';
+import { Calendar, ClipboardList, User, Layers } from 'lucide-react';
 
 interface HeaderProps {
   date: string;
@@ -8,7 +8,6 @@ interface HeaderProps {
   setSku: (sku: string) => void;
   shiftReportedBy: string;
   setShiftReportedBy: (name: string) => void;
-  onOpenAndroidModal?: () => void;
 }
 
 const COMMON_SKUS = [
@@ -26,32 +25,17 @@ export default function Header({
   sku,
   setSku,
   shiftReportedBy,
-  setShiftReportedBy,
-  onOpenAndroidModal
+  setShiftReportedBy
 }: HeaderProps) {
   return (
     <div className="bg-white border border-brand-beige-200 rounded-xl p-6 shadow-xs relative overflow-hidden">
       {/* Visual Woodgrain Accent Panel */}
       <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-brand-beige-800 via-brand-beige-300 to-brand-forest-600"></div>
 
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900 tracking-tight font-sans">
-            Daily QC Defect Log
-          </h1>
-        </div>
-
-        {/* Android App Button */}
-        {onOpenAndroidModal && (
-          <button
-            onClick={onOpenAndroidModal}
-            className="self-start sm:self-center px-3.5 py-2 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-900 border border-emerald-300/80 text-xs font-bold flex items-center gap-2 shadow-2xs transition-all cursor-pointer group shrink-0"
-          >
-            <Smartphone className="w-4 h-4 text-emerald-700 group-hover:scale-110 transition-transform" />
-            <span>Android App</span>
-            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-          </button>
-        )}
+      <div className="mb-6">
+        <h1 className="text-2xl font-bold text-gray-900 tracking-tight font-sans">
+          Daily QC Defect Log
+        </h1>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">

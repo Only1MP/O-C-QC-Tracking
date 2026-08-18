@@ -6,7 +6,7 @@ import {
   RotateCcw, 
   Edit2, 
   Check, 
-  Smartphone, 
+  LayoutList, 
   Grid3X3
 } from 'lucide-react';
 
@@ -165,7 +165,7 @@ export default function DefectMatrixTable({
           {/* Dual layout switch */}
           <div className="flex bg-brand-beige-100 p-1 rounded-lg border border-brand-beige-200 shadow-3xs">
             <button
-              id="layout-mobile-btn"
+              id="layout-list-btn"
               onClick={() => setViewMode('mobile')}
               className={`flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-md transition-all cursor-pointer ${
                 viewMode === 'mobile'
@@ -173,8 +173,8 @@ export default function DefectMatrixTable({
                   : 'text-gray-600 hover:text-gray-900'
               }`}
             >
-              <Smartphone className="w-3.5 h-3.5" />
-              <span>Mobile View</span>
+              <LayoutList className="w-3.5 h-3.5" />
+              <span>List View</span>
             </button>
             <button
               id="layout-grid-btn"
